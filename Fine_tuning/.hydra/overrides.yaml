@@ -1,0 +1,4 @@
+- output_dir=datasets/
+- path=datasets/train.csv
+- split=train
+- ensure_ascii=False

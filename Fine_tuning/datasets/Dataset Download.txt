@@ -1,0 +1,19 @@
+curl -X POST "https://datacollective.mozillafoundation.org/api/datasets/cmflnuzw55y8stkav91ul91ix/download" -H "Authorization: Bearer c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797" -H "Content-Type: application/json"
+
+curl -X GET "https://datacollective.mozillafoundation.org/api/datasets/cmflnuzw55y8stkav91ul91ix/download/dlt_f5424e25-14ee-4526-b2b2-fe57e13555d6" -H "Authorization: Bearer c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797" -o "Common Voice Scripted Speech 23.0 - Italian.tar.gz"
+
+Usage Instructions:
+Replace YOUR_API_KEY with your actual API key in both commands
+Run the create download session command to get a download token
+Replace DOWNLOAD_TOKEN with the token from step 1
+Run the download command to get the dataset file
+
+ClientID: mdc_932da5e79744c651909cdbe1af51c978
+API key: c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797
+
+
+'Common Voice Scripted Speech 23.0 - Italian.tar.gz'
+
+
+
+voglio che estrai questa cartella in modo veloce e senza che mi dia tutti gli errori di prima. risolvi solo senza aggiungere cose o fare cose strane. è una cartella di 10 GB

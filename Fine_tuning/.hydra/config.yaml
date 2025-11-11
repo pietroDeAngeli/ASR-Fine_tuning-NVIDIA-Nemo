@@ -1,0 +1,10 @@
+output_dir: datasets/
+path: datasets/train.csv
+name: null
+split: train
+sampling_rate: 16000
+streaming: false
+num_proc: -1
+ensure_ascii: false
+resolved_output_dir: ''
+split_output_dir: null
