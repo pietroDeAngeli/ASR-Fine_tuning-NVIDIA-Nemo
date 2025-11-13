@@ -11,7 +11,7 @@ import nemo.collections.asr as nemo_asr
 
 # --- Configuration ---
 
-LANGUAGE = "it"
+LANGUAGE = "IT"
 DATASET_DIR = '../cv-corpus'  # Path to the dataset directory
 
 # Manifest paths
@@ -20,7 +20,7 @@ validation_manifest = os.path.join(DATASET_DIR, "validation_manifest.jsonl")
 test_manifest = os.path.join(DATASET_DIR, "test_manifest.jsonl")
 
 # Path to the model you want to continue training (or fine-tune)
-model_path = "model/sst(0)_cazzo" # Make sure this file exists
+model_path = "model/stt_en_quartznet15x5" # Make sure this file exists
 
 # --- Helper Functions ---
 

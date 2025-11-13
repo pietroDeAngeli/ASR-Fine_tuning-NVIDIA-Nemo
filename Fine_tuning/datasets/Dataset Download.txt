@@ -14,6 +14,34 @@ API key: c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797
 
 'Common Voice Scripted Speech 23.0 - Italian.tar.gz'
 
+-------------------------------------------- Problemi di dipendenze
+sudo apt update
+sudo apt install screen
+screen -S data
 
+#pip install -r requirments.txt
+-------------------------------------------- Problmei di dipendenze
 
-voglio che estrai questa cartella in modo veloce e senza che mi dia tutti gli errori di prima. risolvi solo senza aggiungere cose o fare cose strane. è una cartella di 10 GB
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+source ~/.bashrc
+conda --version
+
+conda create --name nemo python==3.10.12
+conda activate nemo
+
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+pip install wget
+apt-get update && apt-get install -y sox libsndfile1 ffmpeg libsox-fmt-mp3
+pip install matplotlib>=3.3.2
+pip install text-unidecode
+python -m pip install --no-build-isolation git+https://github.com/NVIDIA/NeMo.git@r2.0.0rc0#egg=nemo_toolkit[asr]
+
+------------------------------------------ Potrebbe funzionare sulla macchina di MHD
+
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+
+docker pull nvcr.io/nvidia/nemo:24.01.speech
+

@@ -34,13 +34,6 @@ This project explores how to fine-tune Automatic Speech Recognition (ASR) models
 
 ## Preprocessing Pipeline
 
-Implemented via `preprocess_dataset.py`:
-
-- `convert_mp3_to_wav()`: Convert and resample audio
-- `process_tsv()`: Convert TSV to CSV for manifests
-- `delete_invalidated()`: Remove broken samples
-- `keep_first_n_lines()`: Trim dataset size for quick testing
-- `MVCtoNEMO()`: Convert CSV to NeMo manifest with durations
 
 ---
 
