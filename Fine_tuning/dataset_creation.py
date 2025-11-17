@@ -15,7 +15,7 @@ manifest_validated_mp3 = os.path.join(DATASET_DIR, "validated.tsv") # Path to th
 manifest_validated_wav = os.path.join(DATASET_DIR, "manifest_validated.jsonl") # Path to save the WAV manifest
 
 wav_clips_dir = os.path.join(DATASET_DIR, "wav_clips") # Directory to save converted WAV files
-mp3_clips_dir = os.path.join(DATASET_DIR, "it/clips") # Directory containing original MP3 files
+mp3_clips_dir = os.path.join(DATASET_DIR, "clips") # Directory containing original MP3 files
 
 chars_to_ignore_regex = '[\,\?\.\!\-\;\:\"\“\%\‘\”\�\…\{\}\(\)\[\]\–\’\'\/]' # Characters to remove from text
 
