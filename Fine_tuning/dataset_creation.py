@@ -9,12 +9,10 @@ import json
 
 # --- Configuration ---
 
-DATASET_DIR = '../cv-corpus'  # Path to the dataset directory
+DATASET_DIR = 'datasets'  # Path to the dataset directory
 
-manifest_validated_mp3 = os.path.join(DATASET_DIR, "validated_files.tsv") # Path to the TSV file with validated files
+manifest_validated_mp3 = os.path.join(DATASET_DIR, "validated.tsv") # Path to the TSV file with validated files
 manifest_validated_wav = os.path.join(DATASET_DIR, "manifest_validated.jsonl") # Path to save the WAV manifest
-
-duration_file = os.path.join(DATASET_DIR, "durations.tsv") # Path to save durations
 
 wav_clips_dir = os.path.join(DATASET_DIR, "wav_clips") # Directory to save converted WAV files
 mp3_clips_dir = os.path.join(DATASET_DIR, "it/clips") # Directory containing original MP3 files
