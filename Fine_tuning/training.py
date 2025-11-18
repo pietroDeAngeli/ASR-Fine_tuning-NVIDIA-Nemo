@@ -127,7 +127,7 @@ if __name__ == "__main__":
     with open_dict(cfg):
         # Setup Train Dataloader
         cfg.train_ds.manifest_filepath = train_manifest
-        cfg.train_ds.labels = labels
+        cfg.train_ds.labels = None
         cfg.train_ds.normalize_transcripts = False # Already normalized
         cfg.train_ds.batch_size = 8
         cfg.train_ds.num_workers = 4
@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
         # Setup Validation Dataloader
         cfg.validation_ds.manifest_filepath = validation_manifest
-        cfg.validation_ds.labels = labels
+        cfg.validation_ds.labels = None
         cfg.validation_ds.normalize_transcripts = False
         cfg.validation_ds.batch_size = 4
         cfg.validation_ds.num_workers = 4
@@ -144,9 +144,9 @@ if __name__ == "__main__":
         cfg.validation_ds.trim_silence = True
         
         # Best Practice: Setup Test Dataloader (for final evaluation)
-        cfg.test_ds = {}
+        cfg.test_ds = copy.deepcopy(char_model.cfg.validation_ds)
         cfg.test_ds.manifest_filepath = test_manifest
-        cfg.test_ds.labels = labels
+        cfg.test_ds.labels = None
         cfg.test_ds.normalize_transcripts = False
         cfg.test_ds.batch_size = 4
         cfg.test_ds.num_workers = 4
@@ -154,6 +154,13 @@ if __name__ == "__main__":
     char_model.setup_training_data(cfg.train_ds)
     char_model.setup_multiple_validation_data(cfg.validation_ds)
     char_model.setup_multiple_test_data(cfg.test_ds)
+    
+    # Test dataloader 
+    import itertools
+    dl = char_model.train_dataloader()
+    batch = next(iter(dl))
+    for i, txt in zip(range(5), batch["text"]):
+        print(i, txt)
 
     # --- 5. Setup Optimizer and Augmentation ---
     print("--- Setting up Optimizer ---")
