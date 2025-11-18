@@ -8,6 +8,7 @@ import torch.nn as nn
 import pytorch_lightning as ptl
 from omegaconf import OmegaConf, open_dict
 import nemo.collections.asr as nemo_asr
+from pytorch_lightning.callbacks import Callback
 
 # --- Configuration ---
 
@@ -20,7 +21,7 @@ validation_manifest = os.path.join(DATASET_DIR, "validation_manifest.jsonl")
 test_manifest = os.path.join(DATASET_DIR, "test_manifest.jsonl")
 
 # Path to the model you want to continue training (or fine-tune)
-model_path = "model/stt_en_quartznet15x5" # Make sure this file exists
+model_path = os.path.join("models","stt_en_quartznet15x5.nemo") # Make sure this file exists
 
 # --- Helper Functions ---
 
@@ -28,30 +29,25 @@ def get_charset(manifest_path):
     """
     Reads a JSONL manifest file and computes the character set
     (unique characters) from all transcripts.
+    Returns a sorted list of characters suitable for NeMo CTC models.
     """
-    charset = defaultdict(int)
+    charset = set()
     
     try:
         with open(manifest_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            
-            # Iterate through each line (each JSON object)
-            for line in tqdm(lines, desc=f"Computing character set from {os.path.basename(manifest_path)}"):
+            for line in tqdm(f, desc=f"Computing character set from {os.path.basename(manifest_path)}"):
                 try:
-                    # Parse the JSON line
                     row = json.loads(line)
                 except json.JSONDecodeError:
                     print(f"Skipping malformed line: {line.strip()}")
                     continue
                 
-                # Check if 'text' key exists
                 if 'text' in row:
-                    # Count each character in the transcript
-                    for character in row['text']:
-                        charset[character] += 1
+                    for ch in row['text']:
+                        charset.add(ch)
                 else:
-                    print(f"Skipping line, missing 'text' key: {line.strip()}")
-            
+                    print(f"Skipping line, missing 'text': {line.strip()}")
+
     except FileNotFoundError:
         print(f"Error: Manifest file not found at {manifest_path}")
         return None
@@ -59,7 +55,15 @@ def get_charset(manifest_path):
         print(f"An error occurred: {e}")
         return None
 
-    return list(charset.keys())
+    # Convert to sorted list
+    charset = sorted(list(charset))
+
+    # Ensure blank token "_" exists and is LAST
+    if "_" in charset:
+        charset.remove("_")
+    charset.append("_")
+
+    return charset
 
 
 def enable_bn_se(m):
@@ -70,6 +74,21 @@ def enable_bn_se(m):
         m.train()
         for param in m.parameters():
             param.requires_grad_(True)
+
+# Callback to unfreeze the encoder
+class UnfreezeEncoderCallback(Callback):
+    def __init__(self, unfreeze_epoch: int = 5):
+        super().__init__()
+        self.unfreeze_epoch = unfreeze_epoch
+        self.has_unfrozen = False
+
+    def on_train_epoch_start(self, trainer, pl_module):
+        # pl_module è il tuo char_model (EncDecCTCModel)
+        if (not self.has_unfrozen) and trainer.current_epoch >= self.unfreeze_epoch:
+            print(f"\n[Callback] Unfreezing encoder at epoch {trainer.current_epoch}...\n")
+            pl_module.encoder.unfreeze()  # rende tutti i parametri trainable
+            pl_module.encoder.train()
+            self.has_unfrozen = True
 
 # --- Main Training Script ---
 
@@ -84,15 +103,7 @@ if __name__ == "__main__":
     if labels is None:
         raise ValueError(f"Could not read charset from {train_manifest}")
 
-    # Add CTC blank token '_'
-    if '_' not in labels:
-        labels.append('_')
-        
-    # Ensure space is present
-    if ' ' not in labels:
-        labels.append(' ')
-
-    print(f"Final character set ({len(labels)} chars): {''.join(sorted(labels))}")
+    print(f"Final character set ({len(labels)} chars): {''.join(labels)}")
 
     # --- 2. Load Pretrained Model ---
     print(f"--- Loading Model From: {model_path} ---")
@@ -118,6 +129,8 @@ if __name__ == "__main__":
     # Rebuild the decoder for the new vocabulary
     char_model.change_vocabulary(new_vocabulary=labels)
 
+    char_model.cfg.labels = labels
+
     # Copy the model's config
     cfg = copy.deepcopy(char_model.cfg)
 
@@ -127,7 +140,7 @@ if __name__ == "__main__":
     with open_dict(cfg):
         # Setup Train Dataloader
         cfg.train_ds.manifest_filepath = train_manifest
-        cfg.train_ds.labels = None
+        cfg.train_ds.labels = labels
         cfg.train_ds.normalize_transcripts = False # Already normalized
         cfg.train_ds.batch_size = 8
         cfg.train_ds.num_workers = 4
@@ -136,7 +149,7 @@ if __name__ == "__main__":
 
         # Setup Validation Dataloader
         cfg.validation_ds.manifest_filepath = validation_manifest
-        cfg.validation_ds.labels = None
+        cfg.validation_ds.labels = labels
         cfg.validation_ds.normalize_transcripts = False
         cfg.validation_ds.batch_size = 4
         cfg.validation_ds.num_workers = 4
@@ -146,21 +159,16 @@ if __name__ == "__main__":
         # Best Practice: Setup Test Dataloader (for final evaluation)
         cfg.test_ds = copy.deepcopy(char_model.cfg.validation_ds)
         cfg.test_ds.manifest_filepath = test_manifest
-        cfg.test_ds.labels = None
+        cfg.test_ds.labels = labels
         cfg.test_ds.normalize_transcripts = False
         cfg.test_ds.batch_size = 4
         cfg.test_ds.num_workers = 4
 
+    char_model.cfg = cfg
+
     char_model.setup_training_data(cfg.train_ds)
     char_model.setup_multiple_validation_data(cfg.validation_ds)
     char_model.setup_multiple_test_data(cfg.test_ds)
-    
-    # Test dataloader 
-    import itertools
-    dl = char_model.train_dataloader()
-    batch = next(iter(dl))
-    for i, txt in zip(range(5), batch["text"]):
-        print(i, txt)
 
     # --- 5. Setup Optimizer and Augmentation ---
     print("--- Setting up Optimizer ---")
@@ -189,18 +197,22 @@ if __name__ == "__main__":
     print("--- Setting up Trainer ---")
     accelerator = 'gpu' if torch.cuda.is_available() else 'cpu'
     EPOCHS = 50
-
+    
+    UNFREEZE_EPOCH = 1 # Change to 5
+    unfreeze_cb = UnfreezeEncoderCallback(unfreeze_epoch=UNFREEZE_EPOCH)
+    
     trainer = ptl.Trainer(
         devices=1,
         accelerator=accelerator,
         max_epochs=EPOCHS,
         accumulate_grad_batches=1,
-        enable_checkpointing=True, # Save checkpoints
+        enable_checkpointing=True,
         logger=True,
         log_every_n_steps=5,
-        check_val_every_n_epoch=5
+        check_val_every_n_epoch=5,
+        callbacks=[unfreeze_cb],
     )
-
+    
     char_model.set_trainer(trainer)
     char_model.cfg = cfg
 
