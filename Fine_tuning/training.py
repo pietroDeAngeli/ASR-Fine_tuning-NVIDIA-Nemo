@@ -12,7 +12,7 @@ import nemo.collections.asr as nemo_asr
 # --- Configuration ---
 
 LANGUAGE = "IT"
-DATASET_DIR = '../cv-corpus'  # Path to the dataset directory
+DATASET_DIR = 'datasets'  # Path to the dataset directory
 
 # Manifest paths
 train_manifest = os.path.join(DATASET_DIR, "train_manifest.jsonl")
