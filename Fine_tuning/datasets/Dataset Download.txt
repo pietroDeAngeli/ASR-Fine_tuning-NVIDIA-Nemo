@@ -1,8 +1,7 @@
 curl -X POST "https://datacollective.mozillafoundation.org/api/datasets/cmflnuzw55y8stkav91ul91ix/download" -H "Authorization: Bearer c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797" -H "Content-Type: application/json"
 
-curl -X GET "https://datacollective.mozillafoundation.org/api/datasets/cmflnuzw55y8stkav91ul91ix/download/dlt_f5424e25-14ee-4526-b2b2-fe57e13555d6" -H "Authorization: Bearer c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797" -o "Common Voice Scripted Speech 23.0 - Italian.tar.gz"
+curl -X GET "https://datacollective.mozillafoundation.org/api/datasets/cmflnuzw55y8stkav91ul91ix/download/dlt_cf52bb9a-dea7-4ad3-8cc0-c72a2dbed004" -H "Authorization: Bearer c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797" -o "mcv-scripted-it-v23.0.tar.gz"
 
-Usage Instructions:
 Replace YOUR_API_KEY with your actual API key in both commands
 Run the create download session command to get a download token
 Replace DOWNLOAD_TOKEN with the token from step 1
@@ -14,34 +13,35 @@ API key: c85aa062191320460da99dda2e6db3521b8edc1edc60c361f44a61940bdd8797
 
 'Common Voice Scripted Speech 23.0 - Italian.tar.gz'
 
--------------------------------------------- Problemi di dipendenze
-sudo apt update
-sudo apt install screen
-screen -S data
+-------------------------------------------- Procedure
+tar -xzf mcv-scripted-it-v23.0.tar.gz 2>/dev/null # Unzip files
 
-#pip install -r requirments.txt
--------------------------------------------- Problmei di dipendenze
+git init .
+git clone https://github.com/pietroDeAngeli/ASR-Fine_tuning-NVIDIA-Nemo  
 
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-source ~/.bashrc
-conda --version
 
-conda create --name nemo python==3.10.12
-conda activate nemo
+apt update
+apt install screen
+screen -S training
+cd ..
 
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
-pip install wget
-apt-get update && apt-get install -y sox libsndfile1 ffmpeg libsox-fmt-mp3
-pip install matplotlib>=3.3.2
-pip install text-unidecode
-python -m pip install --no-build-isolation git+https://github.com/NVIDIA/NeMo.git@r2.0.0rc0#egg=nemo_toolkit[asr]
+start -> 8.30
 
------------------------------------------- Potrebbe funzionare sulla macchina di MHD
 
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
 
-docker pull nvcr.io/nvidia/nemo:24.01.speech
+
+Sides:
+Deepfakes: 
+ - ricolleziona il dataset
+ - Alternativa per face detection
+ - FPS sampling
+ - Preprocess del dataset
+ - Model Training
+
+
+
+
+
+
+
 
