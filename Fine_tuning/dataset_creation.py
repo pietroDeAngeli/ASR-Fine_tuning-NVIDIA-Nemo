@@ -219,5 +219,3 @@ if __name__ == "__main__":
         validation_manifest,
         test_manifest
     )
-
-    
