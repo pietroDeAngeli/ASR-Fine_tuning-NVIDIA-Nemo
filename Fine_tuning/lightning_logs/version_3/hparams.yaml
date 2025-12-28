@@ -1,0 +1,590 @@
+cfg:
+  decoder:
+    _target_: nemo.collections.asr.modules.ConvASRDecoder
+    feat_in: 1024
+    num_classes: 39
+    vocabulary:
+    - ' '
+    - ''''
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+    - h
+    - i
+    - j
+    - k
+    - l
+    - m
+    - n
+    - o
+    - p
+    - q
+    - r
+    - s
+    - t
+    - u
+    - v
+    - w
+    - x
+    - y
+    - z
+    - "\xE0"
+    - "\xE8"
+    - "\xE9"
+    - "\xEC"
+    - "\xED"
+    - "\xEE"
+    - "\xF2"
+    - "\xF3"
+    - "\xF9"
+    - "\xFA"
+    - _
+  decoding: !!python/object:nemo.collections.asr.parts.submodules.ctc_decoding.CTCDecodingConfig
+    batch_dim_index: 0
+    beam: !!python/object:nemo.collections.asr.parts.submodules.ctc_beam_decoding.BeamCTCInferConfig
+      allow_cuda_graphs: true
+      beam_alpha: null
+      beam_beta: 1.0
+      beam_size: 4
+      beam_threshold: 20.0
+      boosting_tree: !!python/object:nemo.collections.asr.parts.context_biasing.boosting_graph_batched.BoostingTreeModelConfig
+        bpe_alpha: 0.3
+        context_score: 1.0
+        depth_scaling: 2.0
+        final_eos_score: 1.0
+        key_phrases_file: null
+        key_phrases_list: null
+        model_path: null
+        num_of_transcriptions: 5
+        score_per_phrase: 0.0
+        source_lang: en
+        uniform_weights: false
+        unk_score: 0.0
+        use_bpe_dropout: false
+        use_triton: true
+      boosting_tree_alpha: 0.0
+      compute_timestamps: false
+      flashlight_cfg: !!python/object:nemo.collections.asr.parts.submodules.ctc_beam_decoding.FlashlightConfig
+        beam_size_token: 16
+        beam_threshold: 20.0
+        boost_path: null
+        lexicon_path: null
+        sil_weight: 0.0
+        unk_weight: -.inf
+      kenlm_path: null
+      ngram_lm_alpha: 1.0
+      ngram_lm_model: null
+      preserve_alignments: false
+      pyctcdecode_cfg: !!python/object:nemo.collections.asr.parts.submodules.ctc_beam_decoding.PyCTCDecodeConfig
+        beam_prune_logp: -10.0
+        hotword_weight: 10.0
+        hotwords: null
+        prune_history: false
+        token_min_logp: -5.0
+      return_best_hypothesis: true
+      search_type: default
+    compute_timestamps: null
+    confidence_cfg: !!python/object:nemo.collections.asr.parts.utils.asr_confidence_utils.ConfidenceConfig
+      aggregation: min
+      exclude_blank: true
+      method_cfg:
+        alpha: 0.33
+        entropy_norm: exp
+        entropy_type: tsallis
+        name: entropy
+        temperature: DEPRECATED
+      preserve_frame_confidence: false
+      preserve_token_confidence: false
+      preserve_word_confidence: false
+      tdt_include_duration: false
+    ctc_timestamp_type: all
+    greedy: !!python/object:nemo.collections.asr.parts.submodules.ctc_greedy_decoding.GreedyCTCInferConfig
+      allow_cuda_graphs: true
+      boosting_tree: !!python/object:nemo.collections.asr.parts.context_biasing.boosting_graph_batched.BoostingTreeModelConfig
+        bpe_alpha: 0.3
+        context_score: 1.0
+        depth_scaling: 2.0
+        final_eos_score: 1.0
+        key_phrases_file: null
+        key_phrases_list: null
+        model_path: null
+        num_of_transcriptions: 5
+        score_per_phrase: 0.0
+        source_lang: en
+        uniform_weights: false
+        unk_score: 0.0
+        use_bpe_dropout: false
+        use_triton: true
+      boosting_tree_alpha: 0.0
+      compute_timestamps: false
+      confidence_method_cfg:
+        alpha: 0.33
+        entropy_norm: exp
+        entropy_type: tsallis
+        name: entropy
+        temperature: DEPRECATED
+      ngram_lm_alpha: 0.0
+      ngram_lm_model: null
+      preserve_alignments: false
+      preserve_frame_confidence: false
+    preserve_alignments: null
+    segment_gap_threshold: null
+    segment_seperators:
+    - .
+    - '!'
+    - '?'
+    strategy: greedy_batch
+    temperature: 1.0
+    wfst: !!python/object:nemo.collections.asr.parts.submodules.ctc_beam_decoding.WfstCTCInferConfig
+      arpa_lm_path: null
+      beam_size: 4
+      beam_width: 10.0
+      compute_timestamps: false
+      decoding_mode: nbest
+      device: cuda
+      k2_decoding_cfg: !!python/object:nemo.collections.asr.parts.k2.classes.GraphIntersectDenseConfig
+        max_active_states: 10000
+        min_active_states: 30
+        output_beam: 10.0
+        search_beam: 20.0
+      lm_weight: 1.0
+      open_vocabulary_decoding: false
+      preserve_alignments: false
+      return_best_hypothesis: true
+      riva_decoding_cfg: {}
+      search_type: riva
+      wfst_lm_path: null
+    word_seperator: ' '
+  dropout: 0.0
+  encoder:
+    _target_: nemo.collections.asr.modules.ConvASREncoder
+    activation: relu
+    conv_mask: true
+    feat_in: 64
+    jasper:
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 33
+      repeat: 1
+      residual: false
+      separable: true
+      stride:
+      - 2
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 33
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 33
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 33
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 39
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 39
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 256
+      kernel:
+      - 39
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 51
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 51
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 51
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 63
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 63
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 63
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 75
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 75
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 75
+      repeat: 5
+      residual: true
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 2
+      dropout: 0.0
+      filters: 512
+      kernel:
+      - 87
+      repeat: 1
+      residual: false
+      separable: true
+      stride:
+      - 1
+    - dilation:
+      - 1
+      dropout: 0.0
+      filters: 1024
+      kernel:
+      - 1
+      repeat: 1
+      residual: false
+      stride:
+      - 1
+  labels:
+  - ' '
+  - ''''
+  - a
+  - b
+  - c
+  - d
+  - e
+  - f
+  - g
+  - h
+  - i
+  - j
+  - k
+  - l
+  - m
+  - n
+  - o
+  - p
+  - q
+  - r
+  - s
+  - t
+  - u
+  - v
+  - w
+  - x
+  - y
+  - z
+  - "\xE0"
+  - "\xE8"
+  - "\xE9"
+  - "\xEC"
+  - "\xED"
+  - "\xEE"
+  - "\xF2"
+  - "\xF3"
+  - "\xF9"
+  - "\xFA"
+  - _
+  nemo_version: 2.6.0
+  optim:
+    betas:
+    - 0.8
+    - 0.5
+    lr: 0.01
+    name: novograd
+    sched:
+      last_epoch: -1
+      min_lr: 0.0
+      name: CosineAnnealing
+      warmup_ratio: null
+      warmup_steps: null
+    weight_decay: 0.001
+  preprocessor:
+    _target_: nemo.collections.asr.modules.AudioToMelSpectrogramPreprocessor
+    dither: 1.0e-05
+    features: 64
+    frame_splicing: 1
+    n_fft: 512
+    normalize: per_feature
+    sample_rate: 16000
+    stft_conv: false
+    window: hann
+    window_size: 0.02
+    window_stride: 0.01
+  repeat: 5
+  sample_rate: 16000
+  separable: true
+  spec_augment:
+    _target_: nemo.collections.asr.modules.SpectrogramAugmentation
+    rect_freq: 50
+    rect_masks: 5
+    rect_time: 120
+  target: nemo.collections.asr.models.ctc_models.EncDecCTCModel
+  test_ds:
+    batch_size: 16
+    labels:
+    - ' '
+    - ''''
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+    - h
+    - i
+    - j
+    - k
+    - l
+    - m
+    - n
+    - o
+    - p
+    - q
+    - r
+    - s
+    - t
+    - u
+    - v
+    - w
+    - x
+    - y
+    - z
+    - "\xE0"
+    - "\xE8"
+    - "\xE9"
+    - "\xEC"
+    - "\xED"
+    - "\xEE"
+    - "\xF2"
+    - "\xF3"
+    - "\xF9"
+    - "\xFA"
+    - _
+    manifest_filepath: datasets/test_manifest.jsonl
+    normalize_transcripts: false
+    num_workers: 4
+    pin_memory: true
+    sample_rate: 16000
+    shuffle: false
+    trim_silence: true
+  train_ds:
+    batch_size: 32
+    is_tarred: false
+    labels:
+    - ' '
+    - ''''
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+    - h
+    - i
+    - j
+    - k
+    - l
+    - m
+    - n
+    - o
+    - p
+    - q
+    - r
+    - s
+    - t
+    - u
+    - v
+    - w
+    - x
+    - y
+    - z
+    - "\xE0"
+    - "\xE8"
+    - "\xE9"
+    - "\xEC"
+    - "\xED"
+    - "\xEE"
+    - "\xF2"
+    - "\xF3"
+    - "\xF9"
+    - "\xFA"
+    - _
+    manifest_filepath: datasets/train_manifest.jsonl
+    max_duration: 16.7
+    normalize_transcripts: false
+    num_workers: 4
+    pin_memory: true
+    sample_rate: 16000
+    shuffle: true
+    tarred_audio_filepaths: /asr_set_1.2/train/train_{0..1023}.tar
+    trim_silence: true
+  validation_ds:
+    batch_size: 16
+    labels:
+    - ' '
+    - ''''
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+    - g
+    - h
+    - i
+    - j
+    - k
+    - l
+    - m
+    - n
+    - o
+    - p
+    - q
+    - r
+    - s
+    - t
+    - u
+    - v
+    - w
+    - x
+    - y
+    - z
+    - "\xE0"
+    - "\xE8"
+    - "\xE9"
+    - "\xEC"
+    - "\xED"
+    - "\xEE"
+    - "\xF2"
+    - "\xF3"
+    - "\xF9"
+    - "\xFA"
+    - _
+    manifest_filepath: datasets/validation_manifest.jsonl
+    normalize_transcripts: false
+    num_workers: 4
+    pin_memory: true
+    sample_rate: 16000
+    shuffle: false
+    trim_silence: true
